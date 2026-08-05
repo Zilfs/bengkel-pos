@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
                 'name' => 'Owner',
                 'email' => 'owner@example.com',
                 'role' => 'owner',
-                'password' => encrypt('owner12345'), // di-hash, tidak pernah disimpan plain text
+                'password' => bcrypt('owner12345'),
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
                 'name' => 'Kasir',
                 'email' => 'kasir@example.com',
                 'role' => 'kasir',
-                'password' => encrypt('kasir12345'), // di-hash, tidak pernah disimpan plain text
+                'password' => bcrypt('kasir12345'),
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),

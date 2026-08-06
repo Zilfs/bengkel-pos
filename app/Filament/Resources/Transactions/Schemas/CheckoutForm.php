@@ -31,9 +31,6 @@ class CheckoutForm
                 Placeholder::make('total_display')
                     ->label('Total Tagihan')
                     ->content(Number::currency($transaction->total_amount, 'IDR', locale: 'id')),
-                TextInput::make('test_field')
-                    ->label('TEST FIELD - abaikan')
-                    ->default('isi-default'),
                 Repeater::make('payments')
                     ->relationship('payments')
                     ->label('Pembayaran')

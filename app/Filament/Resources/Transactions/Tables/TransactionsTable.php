@@ -28,18 +28,18 @@ class TransactionsTable
                     ->money('IDR', locale: 'id_ID')
                     ->sortable(),
                 TextColumn::make('payment_status')
-                    ->formatStateUsing(fn(string $state) => strtoupper($state))
+                    ->formatStateUsing(fn (string $state) => strtoupper($state))
                     ->badge()
-                    ->color(fn(string $state) => match ($state) {
+                    ->color(fn (string $state) => match ($state) {
                         'paid' => 'success',
                         'unpaid' => 'danger',
                         'partial' => 'warning',
                     })
                     ->searchable(),
                 TextColumn::make('delivery_status')
-                    ->formatStateUsing(fn(string $state) => strtoupper($state))
+                    ->formatStateUsing(fn (string $state) => strtoupper($state))
                     ->badge()
-                    ->color(fn(string $state) => match ($state) {
+                    ->color(fn (string $state) => match ($state) {
                         'delivered' => 'success',
                         'in_progress' => 'info',
                     })
@@ -62,7 +62,7 @@ class TransactionsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make()
-                    ->hidden(fn(Transaction $record): bool => $record->payment_status === 'paid' &&  $record->delivery_status === 'delivered'),
+                    ->hidden(fn (Transaction $record): bool => $record->payment_status === 'paid' && $record->delivery_status === 'delivered'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

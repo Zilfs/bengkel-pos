@@ -48,8 +48,8 @@ class Checkout extends Page implements HasSchemas
 
         if (round($totalDibayar, 2) !== round($totalTagihan, 2)) {
             Notification::make()
-                ->title('Nominal pembayaran tidak sesuai')
-                ->body('Total pembayaran harus sama persis dengan total tagihan transaksi.')
+                ->title('The payment amount is incorrect.')
+                ->body('The total payment must exactly match the total transaction amount..')
                 ->danger()
                 ->send();
 
@@ -63,7 +63,7 @@ class Checkout extends Page implements HasSchemas
         $this->fillFormFromRecord();
 
         Notification::make()
-            ->title('Pembayaran berhasil disimpan')
+            ->title('Payment Saved')
             ->success()
             ->send();
     }
@@ -81,11 +81,11 @@ class Checkout extends Page implements HasSchemas
     {
         return [
             Action::make('create')
-                ->label('Simpan Pembayaran')
+                ->label('Save Payment')
                 ->submit('create'),
             Action::make('cancel')
                 ->color('secondary')
-                ->label('Kembali')
+                ->label('Back')
                 ->url(fn () => TransactionResource::getUrl('view', ['record' => $this->record])),
         ];
     }

@@ -22,13 +22,21 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceTypeResource extends Resource
 {
     protected static ?string $model = ServiceType::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static ?int $navigationSort = 3;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
+    public static function canAccess(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
     public static function form(Schema $schema): Schema
     {
         return $schema

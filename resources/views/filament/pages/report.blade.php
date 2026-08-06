@@ -6,13 +6,13 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;">
 
         <div>
-            <h3 style="font-weight:600;font-size:16px;margin-bottom:12px;">Rekap Komisi per Mekanik</h3>
+            <h3 style="font-weight:600;font-size:16px;margin-bottom:12px;">Commission per Mechanic Recap</h3>
             <table style="width:100%;border-collapse:collapse;">
                 <thead>
-                    <tr style="border-bottom:1px solid #e5e7eb;text-align:left;">
-                        <th style="padding:8px;">Mekanik</th>
-                        <th style="padding:8px;">Jumlah Jasa</th>
-                        <th style="padding:8px;text-align:right;">Total Komisi</th>
+                    <tr style="border-bottom:1px solid #e5e7eb;text-align:leftzzzzzzzzzzz;">
+                        <th style="padding:8px;">Mechabic</th>
+                        <th style="padding:8px;">Number of Service</th>
+                        <th style="padding:8px;text-align:right;">Total Commission</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,8 +27,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" style="padding:8px;color:#9ca3af;">Tidak ada data pada rentang tanggal
-                                ini.</td>
+                            <td colspan="3" style="padding:8px;color:#9ca3af;">There's no data for this date.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -45,13 +44,13 @@
         </div>
 
         <div>
-            <h3 style="font-weight:600;font-size:16px;margin-bottom:12px;">Rekap Uang Masuk per Metode Pembayaran</h3>
+            <h3 style="font-weight:600;font-size:16px;margin-bottom:12px;">Revenue per Payment Method</h3>
             <table style="width:100%;border-collapse:collapse;">
                 <thead>
                     <tr style="border-bottom:1px solid #e5e7eb;text-align:left;">
-                        <th style="padding:8px;">Metode</th>
-                        <th style="padding:8px;">Jumlah Transaksi</th>
-                        <th style="padding:8px;text-align:right;">Total Masuk</th>
+                        <th style="padding:8px;">Method</th>
+                        <th style="padding:8px;">Number of Transaction</th>
+                        <th style="padding:8px;text-align:right;">Total Income</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,8 +65,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" style="padding:8px;color:#9ca3af;">Tidak ada data pada rentang tanggal
-                                ini.</td>
+                            <td colspan="3" style="padding:8px;color:#9ca3af;">There's no data for this range of
+                                date.</td>
                         </tr>
                     @endforelse
                 </tbody>

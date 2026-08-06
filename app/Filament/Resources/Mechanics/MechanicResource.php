@@ -24,15 +24,23 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class MechanicResource extends Resource
 {
     protected static ?string $model = Mechanic::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?int $navigationSort = 4;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrench;
 
     protected static ?string $recordTitleAttribute = 'Mechanic';
-
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
+    public static function canAccess(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
     public static function form(Schema $schema): Schema
     {
         return $schema

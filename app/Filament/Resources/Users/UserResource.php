@@ -16,13 +16,22 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+    protected static ?int $navigationSort = 7;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
+    public static function canAccess(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
     public static function form(Schema $schema): Schema
     {
         return $schema

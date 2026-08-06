@@ -22,7 +22,9 @@ class StockMovementResource extends Resource
 {
     protected static ?string $model = StockMovement::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?int $navigationSort = 6;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ArrowsRightLeft;
 
     public static function form(Schema $schema): Schema
     {
@@ -71,9 +73,9 @@ class StockMovementResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()
-                ->hidden(),
+                    ->hidden(),
                 DeleteAction::make()
-                ->hidden(),
+                    ->hidden(),
             ])
             ->defaultSort('created_at', 'desc');
     }

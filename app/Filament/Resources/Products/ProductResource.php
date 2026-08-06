@@ -24,13 +24,22 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+    protected static ?int $navigationSort = 2;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
+    public static function canAccess(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
     public static function form(Schema $schema): Schema
     {
         return $schema

@@ -25,18 +25,18 @@ class CheckoutForm
                     ->content(Number::currency($transaction->subtotal, 'IDR', locale: 'id')),
 
                 Placeholder::make('discount_display')
-                    ->label('Diskon')
+                    ->label('Discount')
                     ->content(Number::currency($transaction->discount_amount, 'IDR', locale: 'id')),
 
                 Placeholder::make('total_display')
-                    ->label('Total Tagihan')
+                    ->label('Total Bill')
                     ->content(Number::currency($transaction->total_amount, 'IDR', locale: 'id')),
                 Repeater::make('payments')
                     ->relationship('payments')
-                    ->label('Pembayaran')
+                    ->label('Payments')
                     ->schema([
                         Select::make('payment_method')
-                            ->label('Metode')
+                            ->label('Payment Method')
                             ->options([
                                 'cash' => 'Cash',
                                 'qris' => 'QRIS',
@@ -47,21 +47,22 @@ class CheckoutForm
                             ->required(),
 
                         TextInput::make('amount')
-                            ->label('Nominal')
+                            ->label('Amount')
                             ->numeric()
                             ->minValue(1)
+                            ->currencyMask(thousandSeparator: '.', decimalSeparator: ',', precision: 2)
                             ->prefix('Rp')
                             ->required()
                             ->live(onBlur: true), // supaya Placeholder sisa tagihan di bawah ikut ter-update
 
                         DateTimePicker::make('paid_at')
-                            ->label('Tanggal Bayar')
+                            ->label('Paid At')
                             ->native(false)
                             ->default(now())
                             ->required(),
 
                         Select::make('received_by')
-                            ->label('Diterima Oleh')
+                            ->label('Received By')
                             ->options(User::query()->pluck('name', 'id'))
                             ->native(false)
                             ->default(fn () => Auth::id())
@@ -69,12 +70,12 @@ class CheckoutForm
                     ])
                     ->columns(4)
                     ->reorderable(false)
-                    ->addActionLabel('Tambah Pembayaran')
+                    ->addActionLabel('Add Payment')
                     ->defaultItems(0)
                     ->live(),
 
                 Placeholder::make('remaining_display')
-                    ->label('Sisa yang Perlu Dibayar')
+                    ->label('Remaining Bill')
                     ->content(function (Get $get) use ($transaction): string {
                         $paid = collect($get('payments') ?? [])->sum(fn ($row) => (float) ($row['amount'] ?? 0));
                         $remaining = $transaction->total_amount - $paid;

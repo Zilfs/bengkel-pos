@@ -13,6 +13,7 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class Report extends Page implements HasSchemas
 {
@@ -20,14 +21,21 @@ class Report extends Page implements HasSchemas
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static ?string $navigationLabel = 'Laporan';
-
-    protected static ?string $title = 'Rekap Komisi & Pembayaran';
+    protected static ?string $navigationLabel = 'Report';
+    protected static ?int $navigationSort = 8;
+    protected static ?string $title = 'Commission and Payment Report';
 
     protected string $view = 'filament.pages.report';
 
     public ?array $data = [];
-
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
+    public static function canAccess(): bool
+    {
+        return Auth::user()->role == 'owner';
+    }
     public function mount(): void
     {
         $this->form->fill([
@@ -41,13 +49,13 @@ class Report extends Page implements HasSchemas
         return $schema
             ->components([
                 DatePicker::make('date_from')
-                    ->label('Dari Tanggal')
+                    ->label('Date From')
                     ->native(false)
                     ->required()
                     ->live(),
 
                 DatePicker::make('date_to')
-                    ->label('Sampai Tanggal')
+                    ->label('Date To')
                     ->native(false)
                     ->required()
                     ->live(),

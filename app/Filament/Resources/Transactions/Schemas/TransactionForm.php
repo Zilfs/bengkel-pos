@@ -86,7 +86,6 @@ class TransactionForm
                 //     ->prefix('Rp')
                 //     ->default(0),
                 Select::make('payment_status')
-                    ->disabled(fn(string $operation): bool => $operation === 'create')
                     ->native(false)
                     ->options([
                         'unpaid' => 'UNPAID',

@@ -20,6 +20,11 @@ class EditTransaction extends EditRecord
                 ->icon('heroicon-o-clipboard-document-list')
                 ->color('primary')
                 ->url(fn() => TransactionResource::getUrl('add-order', ['record' => $this->getRecord()])),
+            Action::make('checkout')
+                ->label('Checkout')
+                ->icon('heroicon-o-banknotes')
+                ->color('primary')
+                ->url(fn() => TransactionResource::getUrl('checkout', ['record' => $this->getRecord()])),
             ViewAction::make(),
             DeleteAction::make(),
         ];

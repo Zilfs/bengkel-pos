@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Transactions;
 
 use App\Filament\Resources\Transactions\Pages\AddOrder;
+use App\Filament\Resources\Transactions\Pages\Checkout;
+use App\Filament\Resources\Transactions\Pages\CreatePayment;
 use App\Filament\Resources\Transactions\Pages\CreateTransaction;
 use App\Filament\Resources\Transactions\Pages\EditTransaction;
 use App\Filament\Resources\Transactions\Pages\ListTransactions;
@@ -53,6 +55,7 @@ class TransactionResource extends Resource
             'view' => ViewTransaction::route('/{record}'),
             'edit' => EditTransaction::route('/{record}/edit'),
             'add-order' => AddOrder::route('/{record}/add-order'),
+            'checkout' => Checkout::route('/{record}/chekcout'),
         ];
     }
 }

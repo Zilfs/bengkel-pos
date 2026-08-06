@@ -33,45 +33,54 @@ class AddOrder extends Page implements HasSchemas
     }
 
     public function form(Schema $schema): Schema
-    {
-        return OrderForm::configure($schema)
-            ->model($this->record)
-            ->statePath('data');
-    }
+{
+    return OrderForm::configure($schema, $this->record)
+        ->model($this->record)
+        ->statePath('data');
+}
 
-    public function create(): void
-    {
-        $this->form->model($this->record)->saveRelationships();
+public function create(): void
+{
+    $state = $this->form->getState();
 
-        // hitung ulang subtotal dari data yang baru tersimpan di DB
-        $this->record->update([
-            'subtotal' => $this->record->serviceItems()->sum('price_snapshot')
-                + $this->record->productItems()->sum('subtotal_snapshot'),
-        ]);
+    $this->form->model($this->record)->saveRelationships();
 
-        // muat ulang record dari DB (biar relasi tidak pakai cache lama),
-        // lalu isi ulang form supaya original_state cocok dengan data yang baru disimpan
-        $this->record->refresh();
-        $this->fillFormFromRecord();
+    // hitung ulang subtotal dari data yang baru tersimpan di DB (bukan dari state form,
+    // supaya konsisten dengan pola yang sudah ada di method ini sebelumnya)
+    $subtotal = $this->record->serviceItems()->sum('price_snapshot')
+        + $this->record->productItems()->sum('subtotal_snapshot');
 
-        Notification::make()
-            ->title('Order Saved')
-            ->success()
-            ->send();
-    }
+    $discount = (float) ($state['discount_amount'] ?? 0);
 
-    private function fillFormFromRecord(): void
-    {
-        $this->form->fill([
-            'serviceItems' => $this->record->serviceItems
-                ->mapWithKeys(fn($item) => [(string) $item->getKey() => $item->attributesToArray()])
-                ->toArray(),
+    $this->record->update([
+        'subtotal' => $subtotal,
+        'discount_amount' => $discount,
+        'total_amount' => max($subtotal - $discount, 0),
+    ]);
 
-            'productItems' => $this->record->productItems
-                ->mapWithKeys(fn($item) => [(string) $item->getKey() => $item->attributesToArray()])
-                ->toArray(),
-        ]);
-    }
+    $this->record->refresh();
+    $this->fillFormFromRecord();
+
+    Notification::make()
+        ->title('Order Saved')
+        ->success()
+        ->send();
+}
+
+private function fillFormFromRecord(): void
+{
+    $this->form->fill([
+        'serviceItems' => $this->record->serviceItems
+            ->mapWithKeys(fn ($item) => [(string) $item->getKey() => $item->attributesToArray()])
+            ->toArray(),
+
+        'productItems' => $this->record->productItems
+            ->mapWithKeys(fn ($item) => [(string) $item->getKey() => $item->attributesToArray()])
+            ->toArray(),
+
+        'discount_amount' => $this->record->discount_amount,
+    ]);
+}
 
     protected function getFormActions(): array
     {

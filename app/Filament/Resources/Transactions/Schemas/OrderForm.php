@@ -7,6 +7,7 @@ use App\Models\ServiceType;
 use App\Models\TransactionProductItem;
 use App\Models\TransactionServiceItem;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -16,6 +17,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Number;
 
 class OrderForm
 {
@@ -98,6 +100,7 @@ class OrderForm
                                         TextInput::make('price_snapshot')
                                             ->label('Price')
                                             ->numeric()
+                                            ->currencyMask(thousandSeparator: '.', decimalSeparator: ',', precision: 2)
                                             ->prefix('Rp')
                                             ->required()
                                             ->disabled()
@@ -173,6 +176,7 @@ class OrderForm
                                         TextInput::make('price_snapshot')
                                             ->label('Price per item')
                                             ->numeric()
+                                            ->currencyMask(thousandSeparator: '.', decimalSeparator: ',', precision: 2)
                                             ->prefix('Rp')
                                             ->required()
                                             ->disabled()
@@ -191,6 +195,55 @@ class OrderForm
                                     ->defaultItems(0),
                             ]),
                     ]),
+                    Placeholder::make('subtotal_display')
+                ->label('Subtotal')
+                ->live()
+                ->content(function (Get $get): string {
+                    $serviceTotal = collect($get('serviceItems') ?? [])
+                        ->sum(fn ($item) => (float) ($item['price_snapshot'] ?? 0));
+
+                    $productTotal = collect($get('productItems') ?? [])
+                        ->sum(fn ($item) => (float) ($item['subtotal_snapshot'] ?? 0));
+
+                    return Number::currency($serviceTotal + $productTotal, 'IDR', locale: 'id');
+                }),
+
+            TextInput::make('discount_amount')
+                ->label('Diskon')
+                ->numeric()
+                ->currencyMask(thousandSeparator: '.', decimalSeparator: ',', precision: 2)
+                ->minValue(0)
+                ->prefix('Rp')
+                ->default($transaction->discount_amount ?? 0)
+                ->live(onBlur: true)
+                ->rule(function (Get $get) {
+                    return function (string $attribute, $value, \Closure $fail) use ($get) {
+                        $serviceTotal = collect($get('serviceItems') ?? [])
+                            ->sum(fn ($item) => (float) ($item['price_snapshot'] ?? 0));
+                        $productTotal = collect($get('productItems') ?? [])
+                            ->sum(fn ($item) => (float) ($item['subtotal_snapshot'] ?? 0));
+                        $subtotal = $serviceTotal + $productTotal;
+
+                        if ((float) $value > $subtotal) {
+                            $fail('Diskon tidak boleh lebih besar dari subtotal.');
+                        }
+                    };
+                }),
+
+            Placeholder::make('total_display')
+                ->label('Total')
+                ->live()
+                ->content(function (Get $get): string {
+                    $serviceTotal = collect($get('serviceItems') ?? [])
+                        ->sum(fn ($item) => (float) ($item['price_snapshot'] ?? 0));
+                    $productTotal = collect($get('productItems') ?? [])
+                        ->sum(fn ($item) => (float) ($item['subtotal_snapshot'] ?? 0));
+                    $subtotal = $serviceTotal + $productTotal;
+
+                    $discount = (float) ($get('discount_amount') ?? 0);
+
+                    return Number::currency(max($subtotal - $discount, 0), 'IDR', locale: 'id');
+                }),
             ]);
     }
 }

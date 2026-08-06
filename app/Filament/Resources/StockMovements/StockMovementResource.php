@@ -74,7 +74,8 @@ class StockMovementResource extends Resource
                 ->hidden(),
                 DeleteAction::make()
                 ->hidden(),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array

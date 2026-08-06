@@ -19,6 +19,20 @@ class TransactionProductItem extends Model
 {
     use SoftDeletes;
 
+    protected static function booted(): void
+    {
+        static::saving(function (TransactionProductItem $item) {
+            if (blank($item->product_name_snapshot) || blank($item->price_snapshot)) {
+                $product = $item->product ?? \App\Models\Product::find($item->product_id);
+
+                $item->product_name_snapshot ??= $product?->name;
+                $item->price_snapshot ??= $product?->selling_price ?? 0;
+            }
+
+            $item->subtotal_snapshot = $item->price_snapshot * $item->quantity;
+        });
+    }
+
     public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class);

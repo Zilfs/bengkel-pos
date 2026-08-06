@@ -23,6 +23,14 @@ class TransactionServiceItem extends Model
     protected static function booted(): void
     {
         static::saving(function (TransactionServiceItem $item) {
+            if (blank($item->service_name_snapshot) || blank($item->price_snapshot) || $item->commission_percentage_snapshot === null) {
+                $serviceType = $item->serviceType ?? \App\Models\ServiceType::find($item->service_type_id);
+
+                $item->service_name_snapshot ??= $serviceType?->name;
+                $item->price_snapshot ??= $serviceType?->default_price ?? 0;
+                $item->commission_percentage_snapshot ??= $serviceType?->default_commission_percentage ?? 0;
+            }
+
             $item->commission_amount_snapshot = round(
                 $item->price_snapshot * $item->commission_percentage_snapshot / 100,
                 2

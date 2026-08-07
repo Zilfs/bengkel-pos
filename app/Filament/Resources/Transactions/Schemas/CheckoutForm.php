@@ -18,6 +18,8 @@ class CheckoutForm
 {
     public static function configure(Schema $schema, Transaction $transaction): Schema
     {
+        $isLocked = $transaction->payment_status === 'paid';
+
         return $schema
             ->components([
                 Placeholder::make('subtotal_display')
@@ -25,18 +27,22 @@ class CheckoutForm
                     ->content(Number::currency($transaction->subtotal, 'IDR', locale: 'id')),
 
                 Placeholder::make('discount_display')
-                    ->label('Discount')
+                    ->label('Diskon')
                     ->content(Number::currency($transaction->discount_amount, 'IDR', locale: 'id')),
 
                 Placeholder::make('total_display')
-                    ->label('Total Bill')
+                    ->label('Total Tagihan')
                     ->content(Number::currency($transaction->total_amount, 'IDR', locale: 'id')),
+
                 Repeater::make('payments')
                     ->relationship('payments')
-                    ->label('Payments')
+                    ->label('Pembayaran')
+                    ->disabled($isLocked)      // kunci semua field di dalamnya
+                    ->addable(! $isLocked)     // sembunyikan tombol "Tambah Pembayaran"
+                    ->deletable(! $isLocked)   // sembunyikan tombol hapus baris
                     ->schema([
                         Select::make('payment_method')
-                            ->label('Payment Method')
+                            ->label('Metode')
                             ->options([
                                 'cash' => 'Cash',
                                 'qris' => 'QRIS',
@@ -47,22 +53,22 @@ class CheckoutForm
                             ->required(),
 
                         TextInput::make('amount')
-                            ->label('Amount')
+                            ->label('Nominal')
                             ->numeric()
-                            ->minValue(1)
                             ->currencyMask(thousandSeparator: '.', decimalSeparator: ',', precision: 2)
+                            ->minValue(1)
                             ->prefix('Rp')
                             ->required()
                             ->live(onBlur: true), // supaya Placeholder sisa tagihan di bawah ikut ter-update
 
                         DateTimePicker::make('paid_at')
-                            ->label('Paid At')
+                            ->label('Tanggal Bayar')
                             ->native(false)
                             ->default(now())
                             ->required(),
 
                         Select::make('received_by')
-                            ->label('Received By')
+                            ->label('Diterima Oleh')
                             ->options(User::query()->pluck('name', 'id'))
                             ->native(false)
                             ->default(fn () => Auth::id())
@@ -70,12 +76,12 @@ class CheckoutForm
                     ])
                     ->columns(4)
                     ->reorderable(false)
-                    ->addActionLabel('Add Payment')
+                    ->addActionLabel('Tambah Pembayaran')
                     ->defaultItems(0)
                     ->live(),
 
                 Placeholder::make('remaining_display')
-                    ->label('Remaining Bill')
+                    ->label('Sisa yang Perlu Dibayar')
                     ->content(function (Get $get) use ($transaction): string {
                         $paid = collect($get('payments') ?? [])->sum(fn ($row) => (float) ($row['amount'] ?? 0));
                         $remaining = $transaction->total_amount - $paid;

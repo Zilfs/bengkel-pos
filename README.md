@@ -22,6 +22,15 @@ DB_DATABASE=/database/database.sqlite
 php artisan key:generate
 ```
 ### 5. Setup DB
+#### Membuat file database.sqlite
+##### Linux / MacOS
+```bash
+touch ./database/database.sqlite
+```
+##### Windows
+```bash
+echo echo. > ./database/database.sqlite
+```
 ```bash
 php artisan migrate
 php artisan db:seed

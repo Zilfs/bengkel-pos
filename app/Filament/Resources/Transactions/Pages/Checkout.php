@@ -41,15 +41,18 @@ class Checkout extends Page implements HasSchemas
 
     public function create(): void
     {
-        $totalDibayar = collect($this->data['payments'] ?? [])
-            ->sum(fn ($row) => (float) ($row['amount'] ?? 0));
+        $totalDibayar = round(
+            collect($this->data['payments'] ?? [])->sum(fn ($row) => (float) ($row['amount'] ?? 0)),
+            2
+        );
 
-        $totalTagihan = (float) $this->record->total_amount;
+        $totalTagihan = round((float) $this->record->total_amount, 2);
 
-        if (round($totalDibayar, 2) !== round($totalTagihan, 2)) {
+        // overpayment tetap ditolak -- total seluruh pembayaran tidak boleh melebihi total tagihan
+        if ($totalDibayar > $totalTagihan) {
             Notification::make()
                 ->title('The payment amount is incorrect.')
-                ->body('The total payment must exactly match the total transaction amount..')
+                ->body('The total payment cannot exceed the total transaction amount.')
                 ->danger()
                 ->send();
 
@@ -58,12 +61,22 @@ class Checkout extends Page implements HasSchemas
 
         $this->form->model($this->record)->saveRelationships();
 
-        $this->record->update(['payment_status' => 'paid']);
+        $status = match (true) {
+            $totalDibayar <= 0 => 'unpaid',
+            $totalDibayar < $totalTagihan => 'partial',
+            default => 'paid', // $totalDibayar === $totalTagihan
+        };
+
+        $this->record->update(['payment_status' => $status]);
         $this->record->refresh();
         $this->fillFormFromRecord();
 
         Notification::make()
-            ->title('Payment Saved')
+            ->title(match ($status) {
+                'paid' => 'Payment Saved — Fully Paid',
+                'partial' => 'Payment Saved — Partially Paid',
+                default => 'Payment Saved',
+            })
             ->success()
             ->send();
     }
@@ -82,7 +95,8 @@ class Checkout extends Page implements HasSchemas
         return [
             Action::make('create')
                 ->label('Save Payment')
-                ->submit('create'),
+                ->submit('create')
+                ->disabled(fn (): bool => $this->record->payment_status === 'paid'),
             Action::make('cancel')
                 ->color('secondary')
                 ->label('Back')

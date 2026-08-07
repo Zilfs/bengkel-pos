@@ -1,3 +1,35 @@
+## Getting Started
+### 1. Clone Repository
+```bash
+git clone git@github.com:Zilfs/bengkel-pos.git
+```
+### 2. Install Dependency
+```bash
+cd ./bengkel-pos
+composer install
+npm install
+```
+### 3. Setup .env file
+- Copy file .env.example
+- Sesuaikan key dan value pada beberapa emvironment variable, contoh:
+```bash
+APP_NAME="Bengkel POS"
+DB_CONNECTION=sqlite
+DB_DATABASE=/database/database.sqlite
+```
+### 4. Generating App Key
+```bash
+php artisan key:generate
+```
+### 5. Setup DB
+```bash
+php artisan migrate
+php artisan db:seed
+```
+### 6. Run Application
+```bash
+composer run dev
+```
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

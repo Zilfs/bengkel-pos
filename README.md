@@ -41,6 +41,41 @@ php artisan db:seed
 ```bash
 composer run dev
 ```
+### 7. Access Dashboard
+#### Sebagai Owner
+- email: owner@example.com
+- password: owner12345
+#### Sebagai Kasir
+- email: kasir@example.com
+- password: kasir12345
+
+## Testing
+
+### Runnina a test
+```bash
+php artisan test
+```
+atau
+```bash
+php artisan test --filter=CommissionNotAffectedByDiscountTest
+php artisan test --filter=StockMovementOnProductItemChangeTest
+php artisan test --filter=CheckoutPaymentStatusTest
+```
+
+Test 1: CommissionNotAffectedByDiscountTest
+Membuat satu transaksi dengan diskon besar (Rp50.000) dan satu baris jasa, lalu memastikan commission_amount_snapshot yang tersimpan tetap dihitung murni dari price_snapshot × commission_percentage_snapshot, tidak ikut terpotong oleh discount_amount transaksi.
+
+Alasan dipilih: ini aturan bisnis eksplisit dari awal ("diskon murni tanggung jawab owner, bukan hak mekanik yang dipotong"), tapi implementasinya cuma "hidup" karena commission_amount_snapshot dihitung dari kolom yang benar. Sekali saja ada yang menyederhanakan rumus jadi berbasis total_amount (misalnya demi "konsistensi" dengan subtotal lain), aturan ini akan bocor tanpa ada yang sadar sampai owner komplain gaji mekanik salah.
+
+Test 2: StockMovementOnProductItemChangeTest
+Menambah sparepart qty 3 (cek stok berkurang 3), mengubah qty jadi 5 (cek stok cuma berkurang selisihnya 2, bukan direset), lalu membatalkan item itu (cek stok kembali penuh berdasarkan qty terakhir 5, bukan qty awal 3 saat dibuat).
+
+Alasan dipilih: logic wasChanged()/adjustStock() di TransactionProductItem mudah untuk salah tepat di titik "qty terakhir dengan qty awal". Jika terdapat perubahan dan tidak sadar deleted event harus pakai $item->quantity (state saat itu), bukan getOriginal('quantity'), stoknya akan salah setiap kali ada kombinasi edit-lalu-batal dan bug tersebut baru dapat diketahui setelah stok fisik dengan sistem sudah selisih berbulan-bulan.
+
+Test 3: CheckoutPaymentStatusTest
+Membayar sebagian (Rp300rb dari Rp500rb, harus diterima jadi partial), lalu mencoba menambah pembayaran yang totalnya melebihi tagihan (harus ditolak, status tidak berubah), lalu melunasi pas sisanya (harus jadi paid).
+
+Alasan dipilih: Titik ini merupakan bagian krusial dalam manajemen cashflow bengkel, memastikan proses pembayaran dapat berjalan dengan sesuai.
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

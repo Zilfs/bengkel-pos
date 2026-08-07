@@ -31,6 +31,7 @@ touch ./database/database.sqlite
 ```bash
 echo echo. > ./database/database.sqlite
 ```
+#### Running Migration & Seeder
 ```bash
 php artisan migrate
 php artisan db:seed

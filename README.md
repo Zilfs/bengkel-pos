@@ -14,6 +14,7 @@ npm install
 - Sesuaikan key dan value pada beberapa emvironment variable, contoh:
 ```bash
 APP_NAME="Bengkel POS"
+APP_URL=http://localhost:8000
 DB_CONNECTION=sqlite
 DB_DATABASE=/database/database.sqlite
 ```
@@ -29,7 +30,7 @@ touch ./database/database.sqlite
 ```
 ##### Windows
 ```bash
-echo echo. > ./database/database.sqlite
+echo. > ./database/database.sqlite
 ```
 #### Running Migration & Seeder
 ```bash

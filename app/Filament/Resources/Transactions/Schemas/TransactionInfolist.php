@@ -26,17 +26,17 @@ class TransactionInfolist
                 TextEntry::make('total_amount')
                     ->money('IDR', locale: 'id_ID'),
                 TextEntry::make('payment_status')
-                    ->formatStateUsing(fn(string $state) => strtoupper($state))
+                    ->formatStateUsing(fn (string $state) => strtoupper($state))
                     ->badge()
-                    ->color(fn(string $state) => match ($state) {
+                    ->color(fn (string $state) => match ($state) {
                         'paid' => 'success',
                         'unpaid' => 'danger',
                         'partial' => 'warning',
                     }),
                 TextEntry::make('delivery_status')
-                    ->formatStateUsing(fn(string $state) => strtoupper($state))
+                    ->formatStateUsing(fn (string $state) => strtoupper($state))
                     ->badge()
-                    ->color(fn(string $state) => match ($state) {
+                    ->color(fn (string $state) => match ($state) {
                         'delivered' => 'success',
                         'in_progress' => 'info',
                     }),
@@ -47,9 +47,6 @@ class TransactionInfolist
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
 
@@ -94,6 +91,29 @@ class TransactionInfolist
                                             ->money('IDR', locale: 'id_ID'),
                                     ])
                                     ->columns(4),
+                            ]),
+                        Tab::make('Payment')
+                            ->schema([
+                                RepeatableEntry::make('payments')
+                                    ->hiddenLabel()
+                                    ->schema([
+                                        TextEntry::make('payment_method')
+                                            ->label('Metode')
+                                            ->formatStateUsing(fn (string $state) => strtoupper($state))
+                                            ->badge(),
+                                        TextEntry::make('amount')
+                                            ->label('Nominal')
+                                            ->money('IDR', locale: 'id_ID'),
+                                        TextEntry::make('paid_at')
+                                            ->label('Tanggal Bayar')
+                                            ->dateTime(),
+                                        TextEntry::make('receivedBy.name')
+                                            ->label('Diterima Oleh')
+                                            ->placeholder('-'),
+                                        TextEntry::make('notes')
+                                            ->placeholder('-'),
+                                    ])
+                                    ->columns(5),
                             ]),
                     ]),
             ]);
